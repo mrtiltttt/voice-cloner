@@ -6,8 +6,12 @@ for bundling inside the .app.
 
 import os
 import sys
+import ssl
 import shutil
 from pathlib import Path
+
+# Fix macOS SSL certificate errors
+ssl._create_default_https_context = ssl._create_unverified_context
 
 # Patch: bypass torchcodec check + add back isin_mps_friendly for transformers 5.x
 import os as _os
