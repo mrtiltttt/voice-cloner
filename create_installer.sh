@@ -58,23 +58,33 @@ if [ -z "$PYTHON" ]; then
     exit 1
 fi
 
-# ── Step 2: Virtual Environment ───────────────────────────────
-echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "  [2/6] 📦 Віртуальне середовище..."
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-
+# Delete old venv to prevent stale packages
 if [ -d "$VENV_DIR" ]; then
-    echo "♻️  Існуюче середовище знайдено"
-else
-    echo "📦 Створюю .venv..."
-    "$PYTHON" -m venv "$VENV_DIR"
+    echo "🗑  Видаляю старе середовище..."
+    rm -rf "$VENV_DIR"
 fi
+
+echo "📦 Створюю .venv..."
+"$PYTHON" -m venv "$VENV_DIR"
 
 source "$VENV_DIR/bin/activate"
 pip install --upgrade pip --quiet
-echo "📥 Встановлюю залежності..."
-pip install -r "$SCRIPT_DIR/requirements.txt" --quiet
+
+echo "📥 Встановлюю залежності (це може зайняти 5-10 хвилин)..."
+pip install -r "$SCRIPT_DIR/requirements.txt"
+
+# Verify correct versions
+echo ""
+echo "🔍 Перевірка версій..."
+python3 -c "
+import transformers, TTS
+t_ver = transformers.__version__
+tts_ver = TTS.__version__
+print(f'   transformers: {t_ver}')
+print(f'   coqui-tts:    {tts_ver}')
+assert t_ver.startswith('4.4'), f'❌ Потрібен transformers 4.4x, встановлено {t_ver}'
+print('✅ Версії сумісні!')
+"
 echo "✅ Залежності встановлено"
 
 # ── Step 3: Check MPS ────────────────────────────────────────
