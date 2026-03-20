@@ -1,4 +1,4 @@
-coqui-tts>=0.26.1
+coqui-tts[codec]>=0.26.1
 openai-whisper>=20231117
 torch>=2.1.0
 torchaudio>=2.1.0
