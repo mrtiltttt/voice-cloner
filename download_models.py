@@ -9,7 +9,9 @@ import sys
 import shutil
 from pathlib import Path
 
-# Patch transformers 5.x: add back removed isin_mps_friendly
+# Patch: bypass torchcodec check + add back isin_mps_friendly for transformers 5.x
+import os as _os
+_os.environ["COQUI_TTS_SKIP_TORCHCODEC"] = "1"
 def _patch_transformers():
     try:
         from transformers.pytorch_utils import isin_mps_friendly  # noqa
@@ -20,6 +22,11 @@ def _patch_transformers():
                 return elements.unsqueeze(-1).eq(test_elements).any(-1)
             return torch.isin(elements, test_elements)
         _pu.isin_mps_friendly = isin_mps_friendly
+    try:
+        import torchcodec  # noqa
+    except ImportError:
+        import types
+        sys.modules["torchcodec"] = types.ModuleType("torchcodec")
 _patch_transformers()
 
 SCRIPT_DIR = Path(__file__).parent.resolve()

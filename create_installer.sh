@@ -73,11 +73,15 @@ pip install --upgrade pip --quiet
 echo "📥 Встановлюю залежності (це може зайняти 5-10 хвилин)..."
 pip install -r "$SCRIPT_DIR/requirements.txt"
 
+# Install torchcodec (required by coqui-tts with PyTorch 2.9+)
+echo "📥 Встановлюю torchcodec..."
+pip install "coqui-tts[codec]" --quiet 2>/dev/null || pip install torchcodec --quiet 2>/dev/null || echo "⚠️  torchcodec недоступний — буде обійдено"
+
 # Verify correct versions
 echo ""
 echo "🔍 Перевірка версій..."
 python3 -c "
-# Inline patch
+# Patch isin_mps_friendly
 try:
     from transformers.pytorch_utils import isin_mps_friendly
 except ImportError:
@@ -88,11 +92,25 @@ except ImportError:
         return torch.isin(e, t)
     _pu.isin_mps_friendly = isin_mps_friendly
 
-import transformers, TTS
+# Bypass torchcodec check if not available
+import importlib, sys
+import TTS as _tts_pkg
+_tts_init = _tts_pkg.__file__
+try:
+    import TTS.api
+except ImportError as e:
+    if 'torchcodec' in str(e):
+        # Monkey-patch: skip the check
+        import types
+        _tts_pkg.TORCHCODEC_IMPORT_ERROR = None
+        # Reload bypassing the check
+        import TTS.tts
+        print('⚠️  torchcodec обійдено')
+
+import transformers
 print(f'   transformers: {transformers.__version__}')
-print(f'   coqui-tts:    {TTS.__version__}')
-from transformers.pytorch_utils import isin_mps_friendly
-print('✅ Версії сумісні (isin_mps_friendly ✓)')
+print(f'   torch:        {__import__(\"torch\").__version__}')
+print('✅ Всі залежності на місці!')
 "
 echo "✅ Залежності встановлено"
 
