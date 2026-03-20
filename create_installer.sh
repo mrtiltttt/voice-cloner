@@ -73,9 +73,55 @@ pip install --upgrade pip --quiet
 echo "📥 Встановлюю залежності (це може зайняти 5-10 хвилин)..."
 pip install -r "$SCRIPT_DIR/requirements.txt"
 
-# Install torchcodec (required by coqui-tts with PyTorch 2.9+)
+# Install torchcodec if available
 echo "📥 Встановлюю torchcodec..."
-pip install "coqui-tts[codec]" --quiet 2>/dev/null || pip install torchcodec --quiet 2>/dev/null || echo "⚠️  torchcodec недоступний — буде обійдено"
+pip install torchcodec --quiet 2>/dev/null || echo "⚠️  torchcodec недоступний"
+
+# ── Direct-patch installed TTS package ────────────────────────
+echo "🔧 Патчу встановлений TTS пакет..."
+
+TTS_DIR=$(find "$VENV_DIR" -path "*/TTS/__init__.py" -type f 2>/dev/null | head -1 | xargs dirname)
+
+if [ -z "$TTS_DIR" ]; then
+    echo "   ❌ TTS пакет не знайдено!"
+else
+    # 1) Patch autoregressive.py: wrap isin_mps_friendly import
+    AUTOREGRESSIVE="$TTS_DIR/tts/layers/tortoise/autoregressive.py"
+    if [ -f "$AUTOREGRESSIVE" ]; then
+        if grep -q "^from transformers.pytorch_utils import isin_mps_friendly as isin" "$AUTOREGRESSIVE"; then
+            python3 -c "
+p = '$AUTOREGRESSIVE'
+with open(p) as f: code = f.read()
+code = code.replace(
+    'from transformers.pytorch_utils import isin_mps_friendly as isin',
+    '''try:
+    from transformers.pytorch_utils import isin_mps_friendly as isin
+except ImportError:
+    import torch
+    def isin(elements, test_elements):
+        if elements.device.type == \"mps\":
+            return elements.unsqueeze(-1).eq(test_elements).any(-1)
+        return torch.isin(elements, test_elements)'''
+)
+with open(p, 'w') as f: f.write(code)
+"
+            echo "   ✅ autoregressive.py пропатчено (isin_mps_friendly)"
+        else
+            echo "   ♻️  autoregressive.py вже пропатчено"
+        fi
+    fi
+
+    # 2) Patch TTS/__init__.py: skip torchcodec requirement
+    TTS_INIT="$TTS_DIR/__init__.py"
+    if [ -f "$TTS_INIT" ]; then
+        if grep -q "raise ImportError(TORCHCODEC_IMPORT_ERROR)" "$TTS_INIT"; then
+            sed -i '' 's/raise ImportError(TORCHCODEC_IMPORT_ERROR)/pass  # torchcodec bypass/' "$TTS_INIT"
+            echo "   ✅ TTS/__init__.py пропатчено (torchcodec bypass)"
+        else
+            echo "   ♻️  TTS/__init__.py вже пропатчено"
+        fi
+    fi
+fi
 
 # Verify correct versions
 echo ""
