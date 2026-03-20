@@ -76,14 +76,13 @@ pip install -r "$SCRIPT_DIR/requirements.txt"
 # Verify correct versions
 echo ""
 echo "🔍 Перевірка версій..."
-PYTHONPATH="$SCRIPT_DIR" python3 -c "
-from patch_transformers import apply_patches
-apply_patches()
+python3 "$SCRIPT_DIR/patch_transformers.py"
+python3 -c "
+import sys; sys.path.insert(0, '$SCRIPT_DIR')
+from patch_transformers import apply_patches; apply_patches()
 import transformers, TTS
-t_ver = transformers.__version__
-tts_ver = TTS.__version__
-print(f'   transformers: {t_ver}')
-print(f'   coqui-tts:    {tts_ver}')
+print(f'   transformers: {transformers.__version__}')
+print(f'   coqui-tts:    {TTS.__version__}')
 from transformers.pytorch_utils import isin_mps_friendly
 print('✅ Версії сумісні (isin_mps_friendly ✓)')
 "
