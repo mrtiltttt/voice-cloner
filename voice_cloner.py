@@ -22,9 +22,18 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-# Patch transformers 5.x compatibility (must run BEFORE any TTS import)
-from patch_transformers import apply_patches
-apply_patches()
+# Patch transformers 5.x: add back removed isin_mps_friendly
+def _patch_transformers():
+    try:
+        from transformers.pytorch_utils import isin_mps_friendly  # noqa
+    except ImportError:
+        import torch, transformers.pytorch_utils as _pu
+        def isin_mps_friendly(elements, test_elements):
+            if elements.device.type == "mps" or (hasattr(test_elements, "device") and test_elements.device.type == "mps"):
+                return elements.unsqueeze(-1).eq(test_elements).any(-1)
+            return torch.isin(elements, test_elements)
+        _pu.isin_mps_friendly = isin_mps_friendly
+_patch_transformers()
 
 # ── Кольори для терміналу ─────────────────────────────────────
 class C:

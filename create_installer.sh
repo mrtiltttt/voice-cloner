@@ -76,10 +76,18 @@ pip install -r "$SCRIPT_DIR/requirements.txt"
 # Verify correct versions
 echo ""
 echo "🔍 Перевірка версій..."
-python3 patch_transformers.py
 python3 -c "
-import sys; sys.path.insert(0, '.')
-from patch_transformers import apply_patches; apply_patches()
+# Inline patch
+try:
+    from transformers.pytorch_utils import isin_mps_friendly
+except ImportError:
+    import torch, transformers.pytorch_utils as _pu
+    def isin_mps_friendly(e, t):
+        if e.device.type=='mps' or (hasattr(t,'device') and t.device.type=='mps'):
+            return e.unsqueeze(-1).eq(t).any(-1)
+        return torch.isin(e, t)
+    _pu.isin_mps_friendly = isin_mps_friendly
+
 import transformers, TTS
 print(f'   transformers: {transformers.__version__}')
 print(f'   coqui-tts:    {TTS.__version__}')
