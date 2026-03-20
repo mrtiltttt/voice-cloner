@@ -75,6 +75,11 @@ source "$VENV_DIR/bin/activate"
 pip install --upgrade pip --quiet
 echo "📥 Встановлюю залежності..."
 pip install -r "$SCRIPT_DIR/requirements.txt" --quiet
+
+# Force correct transformers version (coqui-tts pulls in incompatible version)
+echo "🔧 Фіксую версію transformers..."
+pip install "transformers>=4.40,<=4.46.2" --quiet --force-reinstall --no-deps
+
 echo "✅ Залежності встановлено"
 
 # ── Step 3: Check MPS ────────────────────────────────────────
