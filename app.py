@@ -8,6 +8,10 @@ Native macOS application for voice cloning using XTTS v2 + Whisper.
 import multiprocessing
 multiprocessing.freeze_support()
 
+# Patch transformers 5.x compatibility (must run BEFORE any TTS import)
+from patch_transformers import apply_patches
+apply_patches()
+
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import threading

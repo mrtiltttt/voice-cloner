@@ -9,6 +9,10 @@ import sys
 import shutil
 from pathlib import Path
 
+# Patch transformers 5.x compatibility (must run BEFORE any TTS import)
+from patch_transformers import apply_patches
+apply_patches()
+
 SCRIPT_DIR = Path(__file__).parent.resolve()
 MODELS_DIR = SCRIPT_DIR / "models"
 

@@ -22,6 +22,10 @@ import time
 from datetime import datetime
 from pathlib import Path
 
+# Patch transformers 5.x compatibility (must run BEFORE any TTS import)
+from patch_transformers import apply_patches
+apply_patches()
+
 # ── Кольори для терміналу ─────────────────────────────────────
 class C:
     BOLD = "\033[1m"

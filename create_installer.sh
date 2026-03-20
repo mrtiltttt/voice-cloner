@@ -77,15 +77,15 @@ pip install -r "$SCRIPT_DIR/requirements.txt"
 echo ""
 echo "🔍 Перевірка версій..."
 python3 -c "
+from patch_transformers import apply_patches
+apply_patches()
 import transformers, TTS
 t_ver = transformers.__version__
 tts_ver = TTS.__version__
 print(f'   transformers: {t_ver}')
 print(f'   coqui-tts:    {tts_ver}')
-t_major = int(t_ver.split('.')[0])
-t_minor = int(t_ver.split('.')[1])
-assert t_major == 4 and t_minor >= 47, f'❌ Потрібен transformers 4.47+, встановлено {t_ver}'
-print('✅ Версії сумісні!')
+from transformers.pytorch_utils import isin_mps_friendly
+print('✅ Версії сумісні (isin_mps_friendly ✓)')
 "
 echo "✅ Залежності встановлено"
 
