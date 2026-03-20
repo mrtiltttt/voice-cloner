@@ -78,7 +78,7 @@ pip install -r "$SCRIPT_DIR/requirements.txt" --quiet
 
 # Force correct transformers version (coqui-tts pulls in incompatible version)
 echo "🔧 Фіксую версію transformers..."
-pip install "transformers>=4.40,<=4.46.2" --quiet --force-reinstall --no-deps
+pip install "transformers>=4.40,<=4.46.2" "tokenizers>=0.20,<0.21" --quiet --force-reinstall
 
 echo "✅ Залежності встановлено"
 
