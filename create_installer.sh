@@ -76,9 +76,9 @@ pip install -r "$SCRIPT_DIR/requirements.txt"
 # Verify correct versions
 echo ""
 echo "🔍 Перевірка версій..."
-python3 "$SCRIPT_DIR/patch_transformers.py"
+python3 patch_transformers.py
 python3 -c "
-import sys; sys.path.insert(0, '$SCRIPT_DIR')
+import sys; sys.path.insert(0, '.')
 from patch_transformers import apply_patches; apply_patches()
 import transformers, TTS
 print(f'   transformers: {transformers.__version__}')
