@@ -1,9 +1,8 @@
-coqui-tts==0.25.3
+coqui-tts==0.26.1
 openai-whisper>=20231117
 torch>=2.1.0
 torchaudio>=2.1.0
-transformers==4.46.2
-tokenizers==0.20.3
+transformers>=4.47,<5.0
 numpy<2.0
 scipy
 sounddevice>=0.4.6

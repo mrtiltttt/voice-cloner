@@ -82,7 +82,9 @@ t_ver = transformers.__version__
 tts_ver = TTS.__version__
 print(f'   transformers: {t_ver}')
 print(f'   coqui-tts:    {tts_ver}')
-assert t_ver.startswith('4.4'), f'❌ Потрібен transformers 4.4x, встановлено {t_ver}'
+t_major = int(t_ver.split('.')[0])
+t_minor = int(t_ver.split('.')[1])
+assert t_major == 4 and t_minor >= 47, f'❌ Потрібен transformers 4.47+, встановлено {t_ver}'
 print('✅ Версії сумісні!')
 "
 echo "✅ Залежності встановлено"
