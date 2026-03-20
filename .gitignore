@@ -1,0 +1,33 @@
+# Virtual environment
+.venv/
+
+# Models (too large for git, ~3.5 GB)
+models/
+
+# PyInstaller
+build/
+dist/
+*.spec
+
+# macOS
+.DS_Store
+*.app
+
+# DMG
+*.dmg
+.dmg_tmp/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Output audio files
+output/*.wav
+output/*.mp3
+!output/.gitkeep
+
+# Recorded samples (personal voice data)
+samples/*.wav
+samples/*.mp3
+!samples/.gitkeep
