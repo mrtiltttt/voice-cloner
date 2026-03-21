@@ -206,7 +206,7 @@ pyinstaller \
     --noconfirm \
     --clean \
     --onedir \
-    --icon NONE \
+
     --add-data "models:models" \
     --hidden-import "TTS" \
     --hidden-import "TTS.api" \
@@ -230,7 +230,7 @@ pyinstaller \
     --exclude-module "jupyter" \
     --exclude-module "pytest" \
     --exclude-module "setuptools" \
-    app.py 2>&1 | tail -20
+    app.py
 
 if [ ! -d "dist/$APP_NAME.app" ]; then
     echo ""

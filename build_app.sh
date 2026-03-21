@@ -63,7 +63,7 @@ pyinstaller \
     --noconfirm \
     --clean \
     --onedir \
-    --icon NONE \
+    \
     --add-data "models:models" \
     --add-data "samples:samples" \
     --add-data "output:output" \
