@@ -206,7 +206,6 @@ pyinstaller \
     --noconfirm \
     --clean \
     --onedir \
-
     --add-data "models:models" \
     --hidden-import "TTS" \
     --hidden-import "TTS.api" \
